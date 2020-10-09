@@ -2,6 +2,7 @@ package com.example.quanlisachpn.adapter;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
@@ -94,6 +95,9 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                     Spinner spinner = view.findViewById(R.id.spinnerThemHD);
                     txtMaHoaDon = view.findViewById(R.id.txtMaHDThemHD);
                     txtSoLuong = view.findViewById(R.id.txtSoLuongThemHD);
+                    Button btnThem = view.findViewById(R.id.btnThemThemHd);
+                    Button btnHuy = view.findViewById(R.id.btnHuyThemHD);
+                    btnThem.setText("Lưu");
 
                     ArrayAdapter arrayAdapter = new ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, HoaDonActivity.spinnerList);
                     spinner.setAdapter(arrayAdapter);
@@ -129,22 +133,23 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
 //                        }
 //                    });
 
-                    builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
+                    final Dialog dialog = builder.create();
                     final String idHoaDon = hoaDonList.get(position).getMaHoaDon();
                     final String idHoaDonChiTiet = String.valueOf(TrangChuAcivity.hoaDonChiTietList.get(position).getId());
-                    builder.setPositiveButton("Lưu", new DialogInterface.OnClickListener() {
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
+                            dialog.cancel();
+                        }
+                    });
+                    btnThem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
                             String ma = txtMaHoaDon.getText().toString().trim();
                             String soLuong = txtSoLuong.getText().toString().trim();
                             String ngay = getDate();
 
-                            if (checkMa(ma,position) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0) {
+                            if (checkMa(ma, position) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0) {
                                 TrangChuAcivity.hoaDonList.remove(holder.getAdapterPosition());
                                 TrangChuAcivity.hoaDonList.add(holder.getAdapterPosition(), new HoaDon(ma, ngay));
                                 TrangChuAcivity.billDao.update(new HoaDon(ma, ngay), idHoaDon);
@@ -153,14 +158,14 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                                 TrangChuAcivity.billDetailDao.upadate(new HoaDonChiTiet(ma, maSach[0], soLuong), idHoaDonChiTiet);
                                 hoaDonList.get(position).textButton = "Edit";
                                 notifyItemChanged(holder.getAdapterPosition());
+                                dialog.cancel();
                                 Toast.makeText(context, "Lưu thành công", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(context, "Bạn không được để trống,số lượng lớn hơn 0 và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
                             }
-
                         }
                     });
-                    builder.show();
+                    dialog.show();
                 } else {
                     TrangChuAcivity.billDao.delete(TrangChuAcivity.hoaDonList.get(position).getMaHoaDon());
                     TrangChuAcivity.billDetailDao.delete(String.valueOf(TrangChuAcivity.hoaDonChiTietList.get(position).getId()));
@@ -193,7 +198,7 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
         return -1;
     }
 
-    public String getDate(){
+    public String getDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.format(calendar.getTime());

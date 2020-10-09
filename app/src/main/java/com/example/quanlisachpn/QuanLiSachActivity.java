@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -209,6 +210,9 @@ public class QuanLiSachActivity extends AppCompatActivity {
                     textMa = view.findViewById(R.id.textThemMaSach);
                     textSoLuong = view.findViewById(R.id.textThemSoLuong);
                     textGia = view.findViewById(R.id.textThemGia);
+                    Button btnHuy, btnThem;
+                    btnHuy = view.findViewById(R.id.btnHuyThemSach);
+                    btnThem = view.findViewById(R.id.btnThemThemSach);
 
                     // lấy giá trị của spinner
                     final String[] theloai = new String[1];
@@ -224,10 +228,16 @@ public class QuanLiSachActivity extends AppCompatActivity {
                         }
                     });
 
-
-                    builder.setNegativeButton("Thêm", new DialogInterface.OnClickListener() {
+                    final Dialog dialog = builder.create();
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
+                            dialog.cancel();
+                        }
+                    });
+                    btnThem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
                             String ten = textTen.getText().toString().trim();
                             String ma = textMa.getText().toString().trim();
                             String soLuong = textSoLuong.getText().toString().trim();
@@ -240,6 +250,7 @@ public class QuanLiSachActivity extends AppCompatActivity {
                                 sachList.get(sachList.size() - 1).setTextButton(textButton);
                                 recyclerSach.notifyItemInserted(sachList.size());
                                 TrangChuAcivity.bookDao.insert(new Sach(ten, ma, Integer.parseInt(soLuong), gia, theloai[0]));
+                                dialog.cancel();
                             } else if (ma.length() == 0 || ten.length() == 0 | soLuong.length() == 0 || gia.length() == 0) {
                                 Toast.makeText(QuanLiSachActivity.this, "Thêm thất bại. Bạn không được để trống", Toast.LENGTH_SHORT).show();
                             } else {
@@ -251,16 +262,11 @@ public class QuanLiSachActivity extends AppCompatActivity {
                                     Toast.makeText(QuanLiSachActivity.this, "Thêm thất bại. Số lượng và giá phải lớn hơn 0", Toast.LENGTH_SHORT).show();
                                 }
                             }
-
-
                         }
                     });
-                    builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
-                    builder.show();
+
+                    dialog.show();
+
                 }
                 break;
 

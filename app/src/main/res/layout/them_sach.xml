@@ -102,5 +102,38 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout6"
         app:layout_constraintVertical_bias="0.045" />
 
+    <Button
+        android:id="@+id/btnHuyThemSach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hủy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.207"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:layout_constraintVertical_bias="0.219" />
+
+    <Button
+        android:id="@+id/btnThemThemSach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Thêm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.613"
+        app:layout_constraintStart_toEndOf="@+id/btnHuyThemSach"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:layout_constraintVertical_bias="0.219" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="13dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerThemSach"
+        app:layout_constraintVertical_bias="0.092"
+        tools:layout_editor_absoluteX="16dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

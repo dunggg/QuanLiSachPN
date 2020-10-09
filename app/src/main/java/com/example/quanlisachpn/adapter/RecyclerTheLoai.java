@@ -1,6 +1,7 @@
 package com.example.quanlisachpn.adapter;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -78,15 +79,25 @@ public class RecyclerTheLoai extends RecyclerView.Adapter<RecyclerTheLoai.ViewHo
 
                     final TextView txtName = view.findViewById(R.id.txtThemTenTL);
                     final TextView txtMa = view.findViewById(R.id.txtThemMaTL);
+                    Button btnHuy, btnThem;
+                    btnHuy = view.findViewById(R.id.btnHuyThemTL);
+                    btnThem = view.findViewById(R.id.btnThemThemTL);
+                    btnThem.setText("Lưu");
 
-
-                    builder.setNegativeButton("Lưu", new DialogInterface.OnClickListener() {
+                    final Dialog dialog = builder.create();
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
+                            dialog.cancel();
+                        }
+                    });
+                    btnThem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
                             String name = txtName.getText().toString().trim();
                             String ma = txtMa.getText().toString().trim();
 
-                            if (checkTen(name,i) && checkMa(ma,i) < 0) {
+                            if (checkTen(name, i) && checkMa(ma, i) < 0) {
                                 theLoaiList.remove(holder.getAdapterPosition());
                                 theLoaiList.add(holder.getAdapterPosition(), new TheLoai(ma, name, soLuong));
                                 theLoaiList.get(i).textButton = "Edit";
@@ -94,19 +105,14 @@ public class RecyclerTheLoai extends RecyclerView.Adapter<RecyclerTheLoai.ViewHo
                                 notifyItemChanged(holder.getAdapterPosition());
                                 TrangChuAcivity.bookTypeDao.update(new TheLoai(ma, name, soLuong), id);
                                 Toast.makeText(context, "Sửa thành công", Toast.LENGTH_SHORT).show();
-                            }else {
+                                dialog.cancel();
+                            } else {
                                 Toast.makeText(context, "Sửa thất bại. Bạn không được để trống hoặc mã,tên đã tồn tại", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-                    builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
 
-                        }
-                    });
-                    builder.show();
-
+                    dialog.show();
                 } else {
                     if (TrangChuAcivity.theLoaiList.get(i).getSoLuong() == 0) {
                         TrangChuAcivity.bookTypeDao.delete(theLoaiList.get(holder.getAdapterPosition()).getMa());
@@ -125,13 +131,11 @@ public class RecyclerTheLoai extends RecyclerView.Adapter<RecyclerTheLoai.ViewHo
         return theLoaiList.size();
     }
 
-    public int checkMa(String ma,int position) {
+    public int checkMa(String ma, int position) {
 
         if (ma.equals("")) {
             return 0;
-        }
-
-        else if (ma.equals(theLoaiList.get(position).getMa())){
+        } else if (ma.equals(theLoaiList.get(position).getMa())) {
             return -1;
         }
 
@@ -143,13 +147,11 @@ public class RecyclerTheLoai extends RecyclerView.Adapter<RecyclerTheLoai.ViewHo
         return -1;
     }
 
-    public boolean checkTen(String ten,int position) {
+    public boolean checkTen(String ten, int position) {
 
         if (ten.equals("")) {
             return false;
-        }
-
-        else if (ten.equals(theLoaiList.get(position).getTenTheLoai())){
+        } else if (ten.equals(theLoaiList.get(position).getTenTheLoai())) {
             return true;
         }
 
@@ -164,6 +166,7 @@ public class RecyclerTheLoai extends RecyclerView.Adapter<RecyclerTheLoai.ViewHo
     public void updateTheLoaiSach(String tenTheLoai, String tenTheLoaiMoi) {
         for (int i = 0; i < TrangChuAcivity.sachList.size(); i++) {
             if (tenTheLoai.equals(TrangChuAcivity.sachList.get(i).getTheLoai())) {
+                TrangChuAcivity.sachList.get(i).setTheLoai(tenTheLoaiMoi);
                 TrangChuAcivity.bookDao.updateTheLoai(TrangChuAcivity.sachList.get(i).getMa(), tenTheLoaiMoi);
             }
         }

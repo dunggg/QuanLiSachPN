@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -149,7 +150,7 @@ public class HoaDonActivity extends AppCompatActivity {
 
     public int checkMa(String ma) {
 
-        if (ma.equals("")){
+        if (ma.equals("")) {
             return 0;
         }
 
@@ -199,6 +200,8 @@ public class HoaDonActivity extends AppCompatActivity {
                     Spinner spinner = view.findViewById(R.id.spinnerThemHD);
                     txtMaHoaDon = view.findViewById(R.id.txtMaHDThemHD);
                     txtSoLuong = view.findViewById(R.id.txtSoLuongThemHD);
+                    Button btnThem = view.findViewById(R.id.btnThemThemHd);
+                    Button btnHuy = view.findViewById(R.id.btnHuyThemHD);
 
                     ArrayAdapter arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, spinnerList);
                     spinner.setAdapter(arrayAdapter);
@@ -234,20 +237,16 @@ public class HoaDonActivity extends AppCompatActivity {
 //                        }
 //                    });
 
-                    builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+                    final Dialog dialog = builder.create();
 
-                    builder.setPositiveButton("Thêm", new DialogInterface.OnClickListener() {
+                    btnThem.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             String ma = txtMaHoaDon.getText().toString().trim();
                             String soLuong = txtSoLuong.getText().toString().trim();
                             String ngay = getDate();
 
-                            if (checkMa(ma)<0&&soLuong.length()>0&&Integer.parseInt(soLuong)>0&&ngay.length()>0){
+                            if (checkMa(ma) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0) {
                                 TrangChuAcivity.hoaDonList.add(new HoaDon(ma, ngay));
                                 TrangChuAcivity.billDao.insert(new HoaDon(ma, ngay));
                                 TrangChuAcivity.hoaDonChiTietList.add(new HoaDonChiTiet(ma, maSach[0], soLuong));
@@ -255,13 +254,22 @@ public class HoaDonActivity extends AppCompatActivity {
                                 TrangChuAcivity.hoaDonList.get(TrangChuAcivity.hoaDonList.size() - 1).textButton = textButton;
                                 recyclerHoaDon.notifyItemInserted(TrangChuAcivity.hoaDonList.size() - 1);
                                 Toast.makeText(HoaDonActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                            }else {
+                                dialog.cancel();
+                            } else {
                                 Toast.makeText(HoaDonActivity.this, "Bạn không được để trống,số lượng lớn hơn 0 và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
                             }
-
                         }
                     });
-                    builder.show();
+
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    dialog.show();
+
                 }
                 break;
             case R.id.itemSua:
@@ -295,7 +303,7 @@ public class HoaDonActivity extends AppCompatActivity {
         RecyclerHoaDon.checkRcvHd = true;
     }
 
-    public String getDate(){
+    public String getDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.format(calendar.getTime());

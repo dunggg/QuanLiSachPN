@@ -1,6 +1,7 @@
 package com.example.quanlisachpn.adapter;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -84,6 +85,10 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                     textMa = view.findViewById(R.id.textThemMaSach);
                     textSoLuong = view.findViewById(R.id.textThemSoLuong);
                     textGia = view.findViewById(R.id.textThemGia);
+                    Button btnHuy, btnThem;
+                    btnHuy = view.findViewById(R.id.btnHuyThemSach);
+                    btnThem = view.findViewById(R.id.btnThemThemSach);
+                    btnThem.setText("Lưu");
 
                     // lấy giá trị của spinner
                     final String[] theloai = new String[1];
@@ -99,10 +104,17 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                         }
                     });
 
+                    final Dialog dialog = builder.create();
 
-                    builder.setNegativeButton("Lưu", new DialogInterface.OnClickListener() {
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
+                            dialog.cancel();
+                        }
+                    });
+                    btnThem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
                             String ten = textTen.getText().toString().trim();
                             String ma = textMa.getText().toString().trim();
                             String soLuong = textSoLuong.getText().toString().trim();
@@ -115,6 +127,7 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                                 sachList.get(i).setTextButton("Edit");
                                 notifyItemChanged(holder.getAdapterPosition());
                                 TrangChuAcivity.bookDao.update(new Sach(ten, ma, Integer.parseInt(soLuong), gia, theloai[0]), id);
+                                dialog.cancel();
                             } else if (ma.length() == 0 || ten.length() == 0 | soLuong.length() == 0 || gia.length() == 0) {
                                 Toast.makeText(context, "Sửa thất bại. Bạn không được để trống", Toast.LENGTH_SHORT).show();
                             } else {
@@ -128,13 +141,8 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                             }
                         }
                     });
-                    builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
 
-                        }
-                    });
-                    builder.show();
+                    dialog.show();;
 
                 } else {
                     TrangChuAcivity.bookDao.delete(sachList.get(holder.getAdapterPosition()).getMa());

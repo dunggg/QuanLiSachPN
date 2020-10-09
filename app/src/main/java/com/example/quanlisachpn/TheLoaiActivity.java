@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -197,11 +199,22 @@ public class TheLoaiActivity extends AppCompatActivity {
                 builder.setView(view);
                 builder.setCancelable(false);
                 builder.setTitle("Thêm thể loại");
-                builder.setNegativeButton("Thêm", new DialogInterface.OnClickListener() {
+                final TextInputEditText txtName = view.findViewById(R.id.txtThemTenTL);
+                final TextInputEditText txtMa = view.findViewById(R.id.txtThemMaTL);
+                Button btnHuy,btnThem;
+                btnHuy = view.findViewById(R.id.btnHuyThemTL);
+                btnThem = view.findViewById(R.id.btnThemThemTL);
+
+                final Dialog dialog = builder.create();
+                btnHuy.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        TextInputEditText txtName = view.findViewById(R.id.txtThemTenTL);
-                        TextInputEditText txtMa = view.findViewById(R.id.txtThemMaTL);
+                    public void onClick(View v) {
+                        dialog.cancel();
+                    }
+                });
+                btnThem.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         String name = txtName.getText().toString().trim();
                         String ma = txtMa.getText().toString().trim();
                         if (checkTen(name) && checkMa(ma) < 0) {
@@ -210,18 +223,13 @@ public class TheLoaiActivity extends AppCompatActivity {
                             recyclerTheLoai.notifyItemInserted(TrangChuAcivity.theLoaiList.size());
                             bookTypeDao.insert(new TheLoai(ma, name, 0));
                             Toast.makeText(TheLoaiActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
+                            dialog.cancel();
                         }else {
                             Toast.makeText(TheLoaiActivity.this, "Thêm thất bại. Bạn không được để trống hoặc mã,tên đã tồn tại", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-                builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.show();
+                dialog.show();
                 break;
 
             case R.id.itemSua:

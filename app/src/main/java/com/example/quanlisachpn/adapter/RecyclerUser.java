@@ -1,5 +1,6 @@
 package com.example.quanlisachpn.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -48,8 +49,8 @@ public class RecyclerUser extends RecyclerView.Adapter<RecyclerUser.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        holder.textUser.setText("Username: "+userList.get(position).getName());
-        holder.textSdt.setText("Phone number: "+userList.get(position).getPhoneNumber());
+        holder.textUser.setText("Username: " + userList.get(position).getName());
+        holder.textSdt.setText("Phone number: " + userList.get(position).getPhoneNumber());
         if (flag == true) {
             holder.btn.setText(userList.get(position).textButton);
             holder.btn.setVisibility(userList.get(position).visibility);
@@ -69,27 +70,42 @@ public class RecyclerUser extends RecyclerView.Adapter<RecyclerUser.ViewHolder> 
                     textUser = view.findViewById(R.id.txtUserSua);
                     textSdt = view.findViewById(R.id.txtSdtSua);
                     textPass = view.findViewById(R.id.txtPassSua);
-                    builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+                    Button btnLuu, btnHuy;
+                    btnHuy = view.findViewById(R.id.btnHuyUser);
+                    btnLuu = view.findViewById(R.id.btnLuuUser);
+                    final Dialog dialog = builder.create();
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
+                        public void onClick(View v) {
+                            dialog.cancel();
                         }
                     });
-                    builder.setPositiveButton("Sửa", new DialogInterface.OnClickListener() {
+                    btnLuu.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             String user = textUser.getText().toString().trim();
                             String sdt = textSdt.getText().toString().trim();
                             String pass = textPass.getText().toString().trim();
-                            ChaoActivity.userDao.update(new User(user, sdt, pass), usename);
-                            ChaoActivity.userList.remove(i);
-                            ChaoActivity.userList.add(i,new User(user, sdt, pass));
-                            userList.get(i).textButton = "Edit";
-                            Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                            notifyItemChanged(i);
+                            if (checkUserName(user, i) && sdt.equals("") == false && pass.equals("") == false && sdt.length() == 10) {
+                                ChaoActivity.userDao.update(new User(user, sdt, pass), usename);
+                                ChaoActivity.userList.remove(i);
+                                ChaoActivity.userList.add(i, new User(user, sdt, pass));
+                                userList.get(i).textButton = "Edit";
+                                Toast.makeText(context, "Sửa thành công", Toast.LENGTH_SHORT).show();
+                                notifyItemChanged(i);
+                                dialog.cancel();
+                            } else {
+                                if (checkUserName(user, i) == false) {
+                                    Toast.makeText(context, "Bạn không được để trống username và username phải chưa tồn tại trong danh sách", Toast.LENGTH_SHORT).show();
+                                } else if (sdt.length() != 10) {
+                                    Toast.makeText(context, "Số điện thoại phải nhập đủ 10 số", Toast.LENGTH_SHORT).show();
+                                } else if (pass.equals("")) {
+                                    Toast.makeText(context, "Password không được để trống", Toast.LENGTH_SHORT).show();
+                                }
+                            }
                         }
                     });
-                    builder.show();
+                    dialog.show();
                 } else {
                     ChaoActivity.userDao.delete(usename);
                     ChaoActivity.userList.remove(i);
@@ -99,6 +115,21 @@ public class RecyclerUser extends RecyclerView.Adapter<RecyclerUser.ViewHolder> 
             }
         });
     }
+
+    public boolean checkUserName(String userName, int position) {
+        if (userName.equals("")) {
+            return false;
+        } else if (userName.equals(userList.get(position).getName())) {
+            return true;
+        }
+        for (int i = 0; i < userList.size(); i++) {
+            if (userName.equals(userList.get(i).getName())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public int getItemCount() {
