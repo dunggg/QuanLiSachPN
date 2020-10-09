@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="270dp"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_marginLeft="50dp"
+        android:orientation="vertical"
+        android:layout_width="200dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/textTenSach"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/textMaSach"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/textTheLoai"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/textSoLuongSach"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/textGiaSach"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+    </LinearLayout>
+
+        <Button
+            android:visibility="gone"
+            android:layout_marginLeft="50dp"
+            android:layout_gravity="center"
+            android:id="@+id/rcvSachBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+</LinearLayout>
