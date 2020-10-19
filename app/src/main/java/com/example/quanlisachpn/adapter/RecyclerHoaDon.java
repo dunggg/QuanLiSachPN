@@ -28,6 +28,7 @@ import com.example.quanlisachpn.model.HoaDonChiTiet;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -54,14 +55,20 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = viewHoler.getAdapterPosition();
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Hóa đơn chi tiết");
-                builder.setMessage("Mã hóa đơn: " + TrangChuAcivity.hoaDonChiTietList.get(position).getMaHoaDon()
-                        + "\nMã sách: " + TrangChuAcivity.hoaDonChiTietList.get(position).getMaSach()
-                        + "\nSố lượng: " + TrangChuAcivity.hoaDonChiTietList.get(position).getSoLuongMua()
-                );
-                builder.show();
+                List<HoaDonChiTiet> thongKeHoaDon = new ArrayList<>();
+                thongKeHoaDon = TrangChuAcivity.billDao.thongKeHoaDon();
+                if (thongKeHoaDon.size()>0) {
+                    int position = viewHoler.getAdapterPosition();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Hóa đơn");
+                    builder.setMessage("Mã hóa đơn: " + thongKeHoaDon.get(position).getMaHoaDon()
+                            + "\nSố lượng sách đã bán: " + thongKeHoaDon.get(position).getSoLuongMua()
+                            + "\nSố lượng hóa đơn chi tiết: " + thongKeHoaDon.get(position).getId()
+                    );
+                    builder.show();
+                }else{
+                    Toast.makeText(context, "Hóa đơn này chưa có hóa đơn chi tiết", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         return viewHoler;
@@ -74,7 +81,7 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
         holder.textMa.setText("Mã hóa đơn: " + hoaDon.getMaHoaDon());
         if (checkRcvHd == true) {
             holder.btn.setText(hoaDon.textButton);
-            holder.btn.setVisibility(hoaDon.visibility);
+            holder.btn.setVisibility(View.VISIBLE);
         }
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,13 +106,13 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                     Button btnHuy = view.findViewById(R.id.btnHuyThemHD);
                     btnThem.setText("Lưu");
 
-                    ArrayAdapter arrayAdapter = new ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, HoaDonActivity.spinnerList);
+                    ArrayAdapter arrayAdapter = new ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, HoaDonActivity.spinnerListMaSach);
                     spinner.setAdapter(arrayAdapter);
                     final String[] maSach = {null};
                     spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            maSach[0] = HoaDonActivity.spinnerList.get(position);
+                            maSach[0] = HoaDonActivity.spinnerListMaSach.get(position);
                         }
 
                         @Override
@@ -148,30 +155,33 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                             String ma = txtMaHoaDon.getText().toString().trim();
                             String soLuong = txtSoLuong.getText().toString().trim();
                             String ngay = getDate();
+                            boolean checkSoLuong = checkSoLuongSua(Integer.parseInt(soLuong), maSach[0], position);
 
-                            if (checkMa(ma, position) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0) {
+                            if (checkMa(ma, position) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0 && checkSoLuong == true) {
                                 TrangChuAcivity.hoaDonList.remove(holder.getAdapterPosition());
                                 TrangChuAcivity.hoaDonList.add(holder.getAdapterPosition(), new HoaDon(ma, ngay));
                                 TrangChuAcivity.billDao.update(new HoaDon(ma, ngay), idHoaDon);
                                 TrangChuAcivity.hoaDonChiTietList.remove(holder.getAdapterPosition());
-                                TrangChuAcivity.hoaDonChiTietList.add(holder.getAdapterPosition(), new HoaDonChiTiet(ma, maSach[0], soLuong));
-                                TrangChuAcivity.billDetailDao.upadate(new HoaDonChiTiet(ma, maSach[0], soLuong), idHoaDonChiTiet);
+                                TrangChuAcivity.hoaDonChiTietList.add(holder.getAdapterPosition(), new HoaDonChiTiet(0, ma, maSach[0], soLuong, getGia(maSach[0], soLuong)));
+                                TrangChuAcivity.billDetailDao.upadate(new HoaDonChiTiet(0, ma, maSach[0], soLuong, getGia(maSach[0], soLuong)), idHoaDonChiTiet);
                                 hoaDonList.get(position).textButton = "Edit";
                                 notifyItemChanged(holder.getAdapterPosition());
                                 dialog.cancel();
                                 Toast.makeText(context, "Lưu thành công", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "Bạn không được để trống,số lượng lớn hơn 0 và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Bạn không được để trống,số lượng lớn hơn 0 (số lượng nhập không được vượt quá số lượng sách) và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                     dialog.show();
                 } else {
-                    TrangChuAcivity.billDao.delete(TrangChuAcivity.hoaDonList.get(position).getMaHoaDon());
-                    TrangChuAcivity.billDetailDao.delete(String.valueOf(TrangChuAcivity.hoaDonChiTietList.get(position).getId()));
-                    TrangChuAcivity.hoaDonChiTietList.remove(position);
-                    TrangChuAcivity.hoaDonList.remove(position);
-                    notifyItemRemoved(position);
+                    if (checkXoaHoaDon() == false) {
+                        TrangChuAcivity.billDao.delete(TrangChuAcivity.hoaDonList.get(position).getMaHoaDon());
+                        TrangChuAcivity.hoaDonList.remove(position);
+                        notifyItemRemoved(position);
+                    } else {
+                        Toast.makeText(context, "Bạn không thể xóa hóa đơn khi liên kết với hóa đơn chi tiết", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -203,6 +213,71 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.format(calendar.getTime());
     }
+
+    public String getGia(String maSach, String soLuong) {
+        int gia = 0;
+        for (int i = 0; i < TrangChuAcivity.sachList.size(); i++) {
+            if (maSach.equals(TrangChuAcivity.sachList.get(i).getMa())) {
+                gia = Integer.parseInt(soLuong) * Integer.parseInt(giaSach(TrangChuAcivity.sachList.get(i).getGia()));
+            }
+        }
+        return convertGia(String.valueOf(gia));
+    }
+
+    public String convertGia(String gia) {
+        String total = "";
+        if (gia.length() <= 3) {
+            return gia + " VNĐ";
+        }
+        // đảo ngược chuỗi string
+        String stringBuilder = new StringBuilder(gia).reverse().toString();
+        int a = 0;
+        for (int i = 3; i < stringBuilder.length(); i += 3) {
+            total += stringBuilder.substring(a, i) + ",";
+            a = i;
+        }
+        total += stringBuilder.substring(a, stringBuilder.length());
+        return new StringBuilder(total).reverse().toString() + " VNĐ";
+    }
+
+    public String giaSach(String gia) {
+        String[] gia1 = gia.split("[,]|\\D");
+        String maMoi = "";
+        for (int i = 0; i < gia1.length; i++) {
+            maMoi += gia1[i];
+        }
+        return maMoi;
+    }
+
+    public boolean checkSoLuongSua(int soLuong, String maSach, int position) {
+        for (int i = 0; i < TrangChuAcivity.sachList.size(); i++) {
+            if (maSach.equals(TrangChuAcivity.sachList.get(i).getMa())) {
+
+                int soLuongSach = TrangChuAcivity.sachList.get(i).getSoLuong();
+                int soLuongHoaDon = Integer.parseInt(TrangChuAcivity.hoaDonChiTietList.get(position).getSoLuongMua());
+
+                if (soLuong <= soLuongSach + soLuongHoaDon) {
+                    TrangChuAcivity.bookDao.updateSoLuong(TrangChuAcivity.sachList.get(i).getMa(), soLuongSach + soLuongHoaDon - soLuong);
+                    TrangChuAcivity.sachList.get(i).setSoLuong(soLuongSach + soLuongHoaDon - soLuong);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkXoaHoaDon() {
+        for (int i = 0; i < TrangChuAcivity.hoaDonList.size(); i++) {
+            for (int j = 0; j < TrangChuAcivity.hoaDonChiTietList.size(); j++) {
+                if (TrangChuAcivity.hoaDonList.get(i).getMaHoaDon().equals(TrangChuAcivity.hoaDonChiTietList.get(j).getMaHoaDon())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     public class ViewHoler extends RecyclerView.ViewHolder {
         TextView textMa, textNgayMua;

@@ -23,6 +23,7 @@ public class BillDetailDao {
         values.put("maHoaDon",hoaDonChiTiet.getMaHoaDon());
         values.put("maSach",hoaDonChiTiet.getMaSach());
         values.put("soLuongMua",hoaDonChiTiet.getSoLuongMua());
+        values.put("gia",hoaDonChiTiet.getGia());
         db.insert("billDetail",null,values);
     }
 
@@ -35,7 +36,8 @@ public class BillDetailDao {
                 String maHoaDon = cursor.getString(cursor.getColumnIndex("maHoaDon"));
                 String maSach = cursor.getString(cursor.getColumnIndex("maSach"));
                 int soLuong = cursor.getInt(cursor.getColumnIndex("soLuongMua"));
-                hoaDonChiTietList.add(new HoaDonChiTiet(maHDCT,maHoaDon,maSach,String.valueOf(soLuong)));
+                String gia = cursor.getString(cursor.getColumnIndex("gia"));
+                hoaDonChiTietList.add(new HoaDonChiTiet(maHDCT,maHoaDon,maSach,String.valueOf(soLuong),gia));
             }
         }
         cursor.close();
@@ -51,6 +53,36 @@ public class BillDetailDao {
         values.put("maHoaDon",hoaDonChiTiet.getMaHoaDon());
         values.put("maSach",hoaDonChiTiet.getMaSach());
         values.put("soLuongMua",hoaDonChiTiet.getSoLuongMua());
+        values.put("gia",hoaDonChiTiet.getGia());
         db.update("billDetail",values,"maHDCT=?",new String[]{maHDCT});
     }
+
+    public List<HoaDonChiTiet> getDateHoaDonChiTiet(){
+        List<HoaDonChiTiet> hoaDonChiTietList = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT billDetail.maHDCT, billDetail.maSach,billDetail.soLuongMua,bill.ngayMua, billDetail.gia, billDetail.maHoaDon " +
+                "FROM billDetail INNER JOIN bill on billDetail.maHoaDon = bill.maHoaDon",null);
+        while (cursor.moveToNext()){
+            int maHDCT = cursor.getInt(cursor.getColumnIndex("maHDCT"));
+            String maHoaDon = cursor.getString(cursor.getColumnIndex("maHoaDon"));
+            String maSach = cursor.getString(cursor.getColumnIndex("maSach"));
+            int soLuong = cursor.getInt(cursor.getColumnIndex("soLuongMua"));
+            String gia = cursor.getString(cursor.getColumnIndex("gia"));
+            String ngaymua = cursor.getString(cursor.getColumnIndex("ngayMua"));
+            hoaDonChiTietList.add(new HoaDonChiTiet(maHDCT,maHoaDon,maSach,String.valueOf(soLuong),gia,ngaymua));
+        }
+        return hoaDonChiTietList;
+    }
+
+    public List<HoaDonChiTiet> sachBanChay(){
+        List<HoaDonChiTiet> hoaDonChiTietList = new ArrayList<>();
+        String sql = "SELECT maSach, sum(soLuongMua) as tongSoLuongMua FROM billDetail GROUP by maSach";
+        Cursor cursor = db.rawQuery(sql,null);
+        while (cursor.moveToNext()){
+            String maSach = cursor.getString(cursor.getColumnIndex("maSach"));
+            int tongSoLuongMua = cursor.getInt(cursor.getColumnIndex("tongSoLuongMua"));
+            hoaDonChiTietList.add(new HoaDonChiTiet(0,"",maSach,String.valueOf(tongSoLuongMua),""));
+        }
+        return hoaDonChiTietList;
+    }
+
 }

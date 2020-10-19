@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.quanlisachpn.model.HoaDon;
+import com.example.quanlisachpn.model.HoaDonChiTiet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,20 @@ public class BillDao {
     public void update(HoaDon hoaDon,String maHoaDon){
         ContentValues values = new ContentValues();
         values.put("maHoaDon",hoaDon.getMaHoaDon());
-        values.put("ngayMua",hoaDon.getNgayMua());
         db.update("bill",values,"maHoaDon=?",new String[]{maHoaDon});
     }
+
+    public List<HoaDonChiTiet> thongKeHoaDon(){
+        List<HoaDonChiTiet> hoaDonChiTietList = new ArrayList<>();
+        String sql = "SELECT bill.maHoaDon, sum(billDetail.soLuongMua) as tongSoLuongMua, count(billDetail.maHDCT) as soHDCT FROM bill INNER JOIN billDetail on bill.maHoaDon = billDetail.maHoaDon GROUP By bill.maHoaDon;";
+        Cursor cursor = db.rawQuery(sql,null);
+        while (cursor.moveToNext()){
+            String maHoaDon = cursor.getString(cursor.getColumnIndex("maHoaDon"));
+            int soLuongMua = cursor.getInt(cursor.getColumnIndex("tongSoLuongMua"));
+            int count = cursor.getInt(cursor.getColumnIndex("soHDCT"));
+            hoaDonChiTietList.add(new HoaDonChiTiet(count,maHoaDon,"",String.valueOf(soLuongMua),""));
+        }
+        return hoaDonChiTietList;
+    }
+
 }

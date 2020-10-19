@@ -15,10 +15,10 @@ public class MySql extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String table_user = "CREATE TABLE user (userName TEXT primary key, password TEXT NOT NULL, sdt TEXT NOT NULL)";
-        String table_book = "CREATE TABLE book (maSach TEXT primary key, tenSach TEXT NOT NULL, soLuong INTEGER, gia FLOAT NOT NULL, theloai TEXT NOT NULL)";
+        String table_book = "CREATE TABLE book (maSach TEXT primary key, tenSach TEXT NOT NULL, soLuong INTEGER, gia INTERGER, theloai TEXT NOT NULL)";
         String table_type = "CREATE TABLE type (maTheLoai TEXT primary key, tenTheLoai TEXT, soLuong TEXT)";
         String table_bill = "CREATE TABLE bill (maHoaDon TEXT primary key, ngayMua DATE NOT NULL )";
-        String table_bill_detail = "CREATE TABLE billDetail (maHDCT INTEGER  PRIMARY KEY AUTOINCREMENT,  maHoaDon TEXT, maSach TEXT, soLuongMua INTERGER)";
+        String table_bill_detail = "CREATE TABLE billDetail (maHDCT INTEGER  PRIMARY KEY AUTOINCREMENT,  maHoaDon TEXT, maSach TEXT, soLuongMua INTERGER, gia INTERGER)";
         db.execSQL(table_user);
         db.execSQL(table_book);
         db.execSQL(table_type);

@@ -1,4 +1,4 @@
-package com.example.quanlisachpn;
+package com.example.quanlisachpn.fragment;
 
 import android.os.Bundle;
 
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.quanlisachpn.R;
+import com.example.quanlisachpn.TrangChuAcivity;
 import com.example.quanlisachpn.adapter.RecyclerThongKe;
 import com.example.quanlisachpn.model.HoaDonChiTiet;
 
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 
 public class Fragment_ThongKeTab1 extends Fragment {
@@ -32,29 +36,14 @@ public class Fragment_ThongKeTab1 extends Fragment {
         recyclerView = view.findViewById(R.id.rcvTk1);
         topSachBanChay();
         RecyclerThongKe recyclerThongKe = new RecyclerThongKe(hoaDonChiTietList, getContext(), R.layout.recycler_thongketab1);
-        recyclerView.setAdapter(recyclerThongKe);
+        recyclerView.setAdapter(new ScaleInAnimationAdapter(recyclerThongKe));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         return view;
     }
 
     public void topSachBanChay() {
-        hoaDonChiTietList = new ArrayList<>();
-        if (TrangChuAcivity.hoaDonChiTietList.size() == 1) {
-            hoaDonChiTietList = TrangChuAcivity.hoaDonChiTietList;
-        } else {
-            for (int i = 0; i < TrangChuAcivity.hoaDonChiTietList.size(); i++) {
-                int soLuong = 0;
-                soLuong += Integer.parseInt(TrangChuAcivity.hoaDonChiTietList.get(i).getSoLuongMua());
-                for (int j = i + 1; j < TrangChuAcivity.hoaDonChiTietList.size(); j++) {
-                    if (TrangChuAcivity.hoaDonChiTietList.get(i).getMaSach().equals(TrangChuAcivity.hoaDonChiTietList.get(j).getMaSach())) {
-                        soLuong += Integer.parseInt(TrangChuAcivity.hoaDonChiTietList.get(j).getSoLuongMua());
-                        TrangChuAcivity.hoaDonChiTietList.remove(j);
-                        j--;
-                    }
-                }
-                hoaDonChiTietList.add(new HoaDonChiTiet("", TrangChuAcivity.hoaDonChiTietList.get(i).getMaSach(), String.valueOf(soLuong)));
-            }
-        }
+       hoaDonChiTietList = new ArrayList<>();
+       hoaDonChiTietList = TrangChuAcivity.billDetailDao.sachBanChay();
         Collections.sort(hoaDonChiTietList, new Comparator<HoaDonChiTiet>() {
             @Override
             public int compare(HoaDonChiTiet o1, HoaDonChiTiet o2) {

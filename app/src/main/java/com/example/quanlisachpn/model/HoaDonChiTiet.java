@@ -5,18 +5,34 @@ public class HoaDonChiTiet {
     private String maHoaDon;
     private String maSach;
     private String soLuongMua;
+    private String gia;
+    private String ngayMua;
+    public String textButton;
 
-    public HoaDonChiTiet(String maHoaDon, String maSach, String soLuongMua) {
-        this.maHoaDon = maHoaDon;
-        this.maSach = maSach;
-        this.soLuongMua = soLuongMua;
-    }
 
-    public HoaDonChiTiet(int id, String maHoaDon, String maSach, String soLuongMua) {
+    public HoaDonChiTiet(int id, String maHoaDon, String maSach, String soLuongMua, String gia) {
         this.id = id;
         this.maHoaDon = maHoaDon;
         this.maSach = maSach;
         this.soLuongMua = soLuongMua;
+        this.gia = gia;
+    }
+
+    public HoaDonChiTiet(int id, String maHoaDon, String maSach, String soLuongMua, String gia, String ngayMua) {
+        this.id = id;
+        this.maHoaDon = maHoaDon;
+        this.maSach = maSach;
+        this.soLuongMua = soLuongMua;
+        this.gia = gia;
+        this.ngayMua = ngayMua;
+    }
+
+    public String getNgayMua() {
+        return ngayMua;
+    }
+
+    public void setNgayMua(String ngayMua) {
+        this.ngayMua = ngayMua;
     }
 
     public int getId() {
@@ -49,5 +65,13 @@ public class HoaDonChiTiet {
 
     public void setSoLuongMua(String soLuongMua) {
         this.soLuongMua = soLuongMua;
+    }
+
+    public String getGia() {
+        return gia;
+    }
+
+    public void setGia(String gia) {
+        this.gia = gia;
     }
 }

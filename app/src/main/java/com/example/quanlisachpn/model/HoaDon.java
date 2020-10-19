@@ -4,7 +4,6 @@ public class HoaDon {
     private String maHoaDon;
     private String ngayMua;
     public String textButton;
-    public int visibility;
 
     public HoaDon(String maHoaDon, String ngayMua) {
         this.maHoaDon = maHoaDon;

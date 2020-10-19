@@ -46,16 +46,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvHD"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tablayoutHoaDon"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="50dp"/>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewpageHoaDon"
+            android:layout_marginTop="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/carviewHD"

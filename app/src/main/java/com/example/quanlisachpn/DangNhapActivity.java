@@ -1,8 +1,10 @@
 package com.example.quanlisachpn;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Notification;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -121,5 +123,27 @@ public class DangNhapActivity extends AppCompatActivity {
             editor.commit();
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(DangNhapActivity.this);
+        builder2.setTitle("Thoát");
+        builder2.setIcon(R.drawable.warning);
+        builder2.setCancelable(false);
+        builder2.setMessage("Bạn có chắc chắn muốn thoát ứng dụng không ?");
+        builder2.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder2.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder2.show();
     }
 }

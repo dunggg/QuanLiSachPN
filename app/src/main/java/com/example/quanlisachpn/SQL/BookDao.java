@@ -38,7 +38,7 @@ public class BookDao {
             ma = cursor.getString(cursor.getColumnIndex("maSach"));
             ten = cursor.getString(cursor.getColumnIndex("tenSach"));
             soLuong = cursor.getInt(cursor.getColumnIndex("soLuong"));
-            gia = String.valueOf(cursor.getFloat(cursor.getColumnIndex("gia")));
+            gia = String.valueOf(cursor.getString(cursor.getColumnIndex("gia")));
             theLoai = cursor.getString(cursor.getColumnIndex("theloai"));
             sachList.add(new Sach(ten,ma,soLuong,gia,theLoai));
         }
@@ -65,5 +65,19 @@ public class BookDao {
         ContentValues values = new ContentValues();
         values.put("theloai",theLoaiMoi);
         db.update("book",values,"maSach=?",new String[]{maSach});
+    }
+
+    public void updateSoLuong(String maSach, int soLuong){
+        ContentValues values = new ContentValues();
+        values.put("soLuong",soLuong);
+        db.update("book",values,"maSach=?",new String[]{maSach});
+    }
+
+    public int getGia(String maSach){
+        String sql = "SELECT maSach, gia FROM book WHERE maSach = '"+maSach+"'";
+        Cursor cursor = db.rawQuery(sql,null);
+        cursor.moveToFirst();
+        int gia = cursor.getInt(cursor.getColumnIndex("gia"));
+        return gia;
     }
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +40,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.FadeInAnimator;
+import jp.wasabeef.recyclerview.animators.FadeInDownAnimator;
+import jp.wasabeef.recyclerview.animators.LandingAnimator;
+import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator;
+import jp.wasabeef.recyclerview.animators.ScaleInBottomAnimator;
+
 public class QuanLiSachActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerSach recyclerSach;
@@ -67,7 +76,8 @@ public class QuanLiSachActivity extends AppCompatActivity {
         recyclerSach = new RecyclerSach(sachList, this, R.layout.recyclerview_sach);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(recyclerSach);
+        recyclerView.setItemAnimator(new ScaleInAnimator());
+        recyclerView.setAdapter(new ScaleInAnimationAdapter(recyclerSach));
 
         listMa = new ArrayList<>();
         arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, listMa);
@@ -246,10 +256,10 @@ public class QuanLiSachActivity extends AppCompatActivity {
                             // kiểm tra điều kiện để thêm sách
                             if (checkMa(ma) < 0 && checkTen(ten) && soLuong.length() != 0 && gia.length() != 0 && Integer.parseInt(soLuong) > 0 && Integer.parseInt(gia) > 0 && spinnerList.size() != 0) {
                                 Toast.makeText(QuanLiSachActivity.this, "Thêm sách thành công", Toast.LENGTH_SHORT).show();
-                                sachList.add(new Sach(ten, ma, Integer.parseInt(soLuong), gia, theloai[0]));
+                                sachList.add(new Sach(ten, ma, Integer.parseInt(soLuong), convertGia(gia), theloai[0]));
                                 sachList.get(sachList.size() - 1).setTextButton(textButton);
-                                recyclerSach.notifyItemInserted(sachList.size());
-                                TrangChuAcivity.bookDao.insert(new Sach(ten, ma, Integer.parseInt(soLuong), gia, theloai[0]));
+                                recyclerSach.notifyItemInserted(sachList.size()-1);
+                                TrangChuAcivity.bookDao.insert(new Sach(ten, ma, Integer.parseInt(soLuong), convertGia(gia), theloai[0]));
                                 dialog.cancel();
                             } else if (ma.length() == 0 || ten.length() == 0 | soLuong.length() == 0 || gia.length() == 0) {
                                 Toast.makeText(QuanLiSachActivity.this, "Thêm thất bại. Bạn không được để trống", Toast.LENGTH_SHORT).show();
@@ -305,6 +315,22 @@ public class QuanLiSachActivity extends AppCompatActivity {
             data.add(TrangChuAcivity.theLoaiList.get(i).getTenTheLoai());
         }
         spinnerList.addAll(data);
+    }
+
+    public String convertGia(String gia) {
+        String total = "";
+        if (gia.length() <= 3) {
+            return gia;
+        }
+        // đảo ngược chuỗi string
+        String stringBuilder = new StringBuilder(gia).reverse().toString();
+        int a = 0;
+        for (int i = 3; i < stringBuilder.length(); i += 3) {
+            total += stringBuilder.substring(a, i) + ",";
+            a = i;
+        }
+        total += stringBuilder.substring(a, stringBuilder.length());
+        return new StringBuilder(total).reverse().toString();
     }
 
 

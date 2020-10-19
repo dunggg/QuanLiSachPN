@@ -38,7 +38,7 @@ public class RecyclerThongKe extends RecyclerView.Adapter<RecyclerThongKe.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.textMa.setText("Mã sách: " + hoaDonChiTietList.get(position).getMaSach());
-        holder.textSoLuongMua.setText("Số lượng mua: " + hoaDonChiTietList.get(position).getSoLuongMua());
+        holder.textSoLuongMua.setText("Số lượng bán ra: " + hoaDonChiTietList.get(position).getSoLuongMua());
     }
 
     @Override

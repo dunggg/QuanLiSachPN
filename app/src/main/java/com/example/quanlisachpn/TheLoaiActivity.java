@@ -36,6 +36,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator;
+
 public class TheLoaiActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerTheLoai recyclerTheLoai;
@@ -64,7 +67,8 @@ public class TheLoaiActivity extends AppCompatActivity {
         recyclerTheLoai = new RecyclerTheLoai(TrangChuAcivity.theLoaiList, this, R.layout.recycler_theloai);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(recyclerTheLoai);
+        recyclerView.setItemAnimator(new ScaleInAnimator());
+        recyclerView.setAdapter(new ScaleInAnimationAdapter(recyclerTheLoai));
 
         listMa = new ArrayList<>();
         arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, listMa);

@@ -34,6 +34,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator;
+
 public class QlNguoiDungActivity extends AppCompatActivity {
 
     RecyclerUser recyclerUser;
@@ -62,7 +65,8 @@ public class QlNguoiDungActivity extends AppCompatActivity {
         recyclerUser = new RecyclerUser(ChaoActivity.userList, this, R.layout.recyclerview_user);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(recyclerUser);
+        recyclerView.setItemAnimator(new ScaleInAnimator());
+        recyclerView.setAdapter(new ScaleInAnimationAdapter(recyclerUser));
 
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

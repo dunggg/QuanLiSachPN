@@ -1,5 +1,6 @@
 package com.example.quanlisachpn.adapter;
 
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -36,6 +37,9 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
         this.sachList = sachList;
         this.context = context;
         this.layout = layout;
+        for (int i = 0; i < sachList.size(); i++) {
+            sachList.get(i).setGia(convertGia(String.valueOf(sachList.get(i).getGia())));
+        }
     }
 
     @NonNull
@@ -54,7 +58,7 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
         holder.textTen.setText("Tên sách: " + sach.getTen());
         holder.textSoLuong.setText("Số lượng: " + String.valueOf(sach.getSoLuong()));
         holder.textMa.setText("Mã sách: " + sach.getMa());
-        holder.textGia.setText("Giá: " + sach.getGia());
+        holder.textGia.setText("Giá: " + sach.getGia() + " VNĐ");
         holder.btn.setText(sach.getTextButton());
         if (checkVisibility == true) {
             holder.btn.setVisibility(sach.getVisibility());
@@ -120,10 +124,10 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                             String soLuong = textSoLuong.getText().toString().trim();
                             String gia = textGia.getText().toString().trim();
 
-                            if (checkMa(ma, i) < 0 && checkTen(ten,i) && soLuong.length() != 0 && gia.length() != 0 && Integer.parseInt(soLuong) > 0 && Integer.parseInt(gia) > 0) {
+                            if (checkMa(ma, i) < 0 && checkTen(ten, i) && soLuong.length() != 0 && gia.length() != 0 && Integer.parseInt(soLuong) > 0 && Integer.parseInt(gia) > 0) {
                                 Toast.makeText(context, "Sửa sách thành công", Toast.LENGTH_SHORT).show();
                                 sachList.remove(holder.getAdapterPosition());
-                                sachList.add(holder.getAdapterPosition(), new Sach(ten, ma, Integer.parseInt(soLuong), gia, theloai[0]));
+                                sachList.add(holder.getAdapterPosition(), new Sach(ten, ma, Integer.parseInt(soLuong), convertGia(gia), theloai[0]));
                                 sachList.get(i).setTextButton("Edit");
                                 notifyItemChanged(holder.getAdapterPosition());
                                 TrangChuAcivity.bookDao.update(new Sach(ten, ma, Integer.parseInt(soLuong), gia, theloai[0]), id);
@@ -131,7 +135,7 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                             } else if (ma.length() == 0 || ten.length() == 0 | soLuong.length() == 0 || gia.length() == 0) {
                                 Toast.makeText(context, "Sửa thất bại. Bạn không được để trống", Toast.LENGTH_SHORT).show();
                             } else {
-                                if (checkTen(ten,i) == false) {
+                                if (checkTen(ten, i) == false) {
                                     Toast.makeText(context, "Sửa thất bại. Tên sách đã tồn tại", Toast.LENGTH_SHORT).show();
                                 } else if (checkMa(ma, 1) >= 0) {
                                     Toast.makeText(context, "Sửa thất bại. Mã sách đã tồn tại", Toast.LENGTH_SHORT).show();
@@ -142,7 +146,8 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
                         }
                     });
 
-                    dialog.show();;
+                    dialog.show();
+                    ;
 
                 } else {
                     TrangChuAcivity.bookDao.delete(sachList.get(holder.getAdapterPosition()).getMa());
@@ -171,9 +176,9 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
         return -1;
     }
 
-    public boolean checkTen(String ten,int position) {
+    public boolean checkTen(String ten, int position) {
 
-        if (ten.equals(sachList.get(position).getTen())){
+        if (ten.equals(sachList.get(position).getTen())) {
             return true;
         }
 
@@ -183,6 +188,23 @@ public class RecyclerSach extends RecyclerView.Adapter<RecyclerSach.ViewHolder> 
             }
         }
         return true;
+    }
+
+
+    public String convertGia(String gia) {
+        String total = "";
+        if (gia.length() <= 3) {
+            return gia;
+        }
+        // đảo ngược chuỗi string
+        String stringBuilder = new StringBuilder(gia).reverse().toString();
+        int a = 0;
+        for (int i = 3; i < stringBuilder.length(); i += 3) {
+            total += stringBuilder.substring(a, i) + ",";
+            a = i;
+        }
+        total += stringBuilder.substring(a, stringBuilder.length());
+        return new StringBuilder(total).reverse().toString();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

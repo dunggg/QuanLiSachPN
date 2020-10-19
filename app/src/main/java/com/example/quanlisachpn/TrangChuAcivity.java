@@ -11,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -66,12 +67,11 @@ public class TrangChuAcivity extends AppCompatActivity {
         sachList = bookDao.getData();
         hoaDonList = billDao.getData();
         hoaDonChiTietList = billDetailDao.getData();
-
         intent = getIntent();
         Bundle bundle = intent.getExtras();
         final String user = bundle.getString("user");
         final String pass = bundle.getString("pass");
-        final int index = bundle.getInt("index",-1);
+        final int index = bundle.getInt("index", -1);
 
 
         setSupportActionBar(toolbar);
@@ -93,7 +93,7 @@ public class TrangChuAcivity extends AppCompatActivity {
                         Toast.makeText(TrangChuAcivity.this, "Chức năng đang trong quá trình hoàn thiện", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.itemDoiMK:
-                        if (index==0) {
+                        if (index == 0) {
                             Toast.makeText(TrangChuAcivity.this, "Đây là tài khoản admin hiện tại chưa thể đổi mật khẩu", Toast.LENGTH_SHORT).show();
                         } else {
                             AlertDialog.Builder builder = new AlertDialog.Builder(TrangChuAcivity.this);
@@ -113,7 +113,7 @@ public class TrangChuAcivity extends AppCompatActivity {
                                     String confirmPass = textConfirmPass.getText().toString().trim();
                                     if (pass.equals(passDoiMK)) {
                                         if (passNew.equals(confirmPass)) {
-                                            ChaoActivity.userList.get(index-1).setPassword(passNew);
+                                            ChaoActivity.userList.get(index - 1).setPassword(passNew);
                                             ChaoActivity.userDao.updatePass(passNew, user);
                                             Toast.makeText(TrangChuAcivity.this, "Đổi mật khẩu thành công !", Toast.LENGTH_SHORT).show();
                                         } else {
@@ -138,24 +138,7 @@ public class TrangChuAcivity extends AppCompatActivity {
                         finish();
                         break;
                     case R.id.itemThoat:
-                        AlertDialog.Builder builder2 = new AlertDialog.Builder(TrangChuAcivity.this);
-                        builder2.setTitle("Thoát");
-                        builder2.setIcon(R.drawable.warning);
-                        builder2.setCancelable(false);
-                        builder2.setMessage("Bạn có chắc chắn muốn thoát ứng dụng không ?");
-                        builder2.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
-                        builder2.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                onBackPressed();
-                            }
-                        });
-                        builder2.show();
+                        onBackPressed();
                         break;
                 }
                 drawerLayout.closeDrawers();
@@ -235,4 +218,26 @@ public class TrangChuAcivity extends AppCompatActivity {
         billDetailDao = new BillDetailDao(mySql);
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(TrangChuAcivity.this);
+        builder2.setTitle("Thoát");
+        builder2.setIcon(R.drawable.warning);
+        builder2.setCancelable(false);
+        builder2.setMessage("Bạn có chắc chắn muốn thoát ứng dụng không ?");
+        builder2.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder2.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder2.show();
+//        super.onBackPressed();
+    }
 }
