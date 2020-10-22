@@ -60,6 +60,7 @@ public class BillDao {
             int count = cursor.getInt(cursor.getColumnIndex("soHDCT"));
             hoaDonChiTietList.add(new HoaDonChiTiet(count,maHoaDon,"",String.valueOf(soLuongMua),""));
         }
+        cursor.close();
         return hoaDonChiTietList;
     }
 

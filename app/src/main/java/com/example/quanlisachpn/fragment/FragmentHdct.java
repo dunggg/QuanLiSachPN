@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class FragmentHdct extends Fragment {
     public static List<HoaDonChiTiet> hoaDonChiTietList;
     RecyclerView recyclerView;
     BillDetailDao billDetailDao;
+    public static boolean checkFragemt = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,6 +47,27 @@ public class FragmentHdct extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setItemAnimator(new ScaleInAnimator());
         recyclerView.setAdapter(new ScaleInAnimationAdapter(recyclerHDCT));
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (checkFragemt==true){
+                    hoaDonChiTietList = billDetailDao.getDateHoaDonChiTiet();
+                    for (int i = 0;i<hoaDonChiTietList.size();i++){
+                        hoaDonChiTietList.get(i).textButton = "Edit";
+                    }
+                    recyclerHDCT = new RecyclerHDCT(hoaDonChiTietList, getContext(), R.layout.recyclerview_hdct);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+                    recyclerView.setItemAnimator(new ScaleInAnimator());
+                    recyclerView.setAdapter(new ScaleInAnimationAdapter(recyclerHDCT));
+                    checkFragemt=false;
+                }
+                new Handler().postDelayed(this,1000);
+            }
+        },1000);
         return view;
     }
+
 }

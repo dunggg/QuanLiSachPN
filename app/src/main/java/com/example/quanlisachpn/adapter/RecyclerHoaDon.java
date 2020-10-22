@@ -21,7 +21,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quanlisachpn.HoaDonActivity;
+import com.example.quanlisachpn.SQL.BillDetailDao;
+import com.example.quanlisachpn.SQL.MySql;
 import com.example.quanlisachpn.TrangChuAcivity;
+import com.example.quanlisachpn.fragment.FragmentHdct;
 import com.example.quanlisachpn.model.HoaDon;
 import com.example.quanlisachpn.R;
 import com.example.quanlisachpn.model.HoaDonChiTiet;
@@ -57,7 +60,7 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
             public void onClick(View v) {
                 List<HoaDonChiTiet> thongKeHoaDon = new ArrayList<>();
                 thongKeHoaDon = TrangChuAcivity.billDao.thongKeHoaDon();
-                if (thongKeHoaDon.size()>0) {
+                if (thongKeHoaDon.size() > 0) {
                     int position = viewHoler.getAdapterPosition();
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Hóa đơn");
@@ -66,7 +69,7 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                             + "\nSố lượng hóa đơn chi tiết: " + thongKeHoaDon.get(position).getId()
                     );
                     builder.show();
-                }else{
+                } else {
                     Toast.makeText(context, "Hóa đơn này chưa có hóa đơn chi tiết", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -97,48 +100,11 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                     builder.setView(view);
 
                     final TextInputEditText txtMaHoaDon, txtSoLuong;
-//                    final TextView textNgay = view.findViewById(R.id.textNgay);
-//                    Button btnNgay = view.findViewById(R.id.btnChonNgay);
-                    Spinner spinner = view.findViewById(R.id.spinnerThemHD);
                     txtMaHoaDon = view.findViewById(R.id.txtMaHDThemHD);
-                    txtSoLuong = view.findViewById(R.id.txtSoLuongThemHD);
                     Button btnThem = view.findViewById(R.id.btnThemThemHd);
                     Button btnHuy = view.findViewById(R.id.btnHuyThemHD);
                     btnThem.setText("Lưu");
 
-                    ArrayAdapter arrayAdapter = new ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, HoaDonActivity.spinnerListMaSach);
-                    spinner.setAdapter(arrayAdapter);
-                    final String[] maSach = {null};
-                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            maSach[0] = HoaDonActivity.spinnerListMaSach.get(position);
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> parent) {
-
-                        }
-                    });
-
-//                    btnNgay.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Calendar calendar = Calendar.getInstance();
-//                            int year = calendar.get(Calendar.YEAR);
-//                            int month = calendar.get(Calendar.MONTH);
-//                            int day = calendar.get(Calendar.DAY_OF_MONTH);
-//                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//                                DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
-//                                    @Override
-//                                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-//                                        textNgay.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
-//                                    }
-//                                }, year, month, day);
-//                                datePickerDialog.show();
-//                            }
-//                        }
-//                    });
 
                     final Dialog dialog = builder.create();
                     final String idHoaDon = hoaDonList.get(position).getMaHoaDon();
@@ -153,23 +119,27 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                         @Override
                         public void onClick(View v) {
                             String ma = txtMaHoaDon.getText().toString().trim();
-                            String soLuong = txtSoLuong.getText().toString().trim();
                             String ngay = getDate();
-                            boolean checkSoLuong = checkSoLuongSua(Integer.parseInt(soLuong), maSach[0], position);
+                            if (checkMa(ma, position) < 0) {
 
-                            if (checkMa(ma, position) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0 && checkSoLuong == true) {
-                                TrangChuAcivity.hoaDonList.remove(holder.getAdapterPosition());
-                                TrangChuAcivity.hoaDonList.add(holder.getAdapterPosition(), new HoaDon(ma, ngay));
+                                // update mã hóa đơn sau khi sửa hóa đơn
+                                TrangChuAcivity.billDetailDao.updateMaHoaDon(hoaDonList.get(position).getMaHoaDon(), ma);
+
+                                hoaDonList.remove(holder.getAdapterPosition());
+                                hoaDonList.add(holder.getAdapterPosition(), new HoaDon(ma, ngay));
                                 TrangChuAcivity.billDao.update(new HoaDon(ma, ngay), idHoaDon);
-                                TrangChuAcivity.hoaDonChiTietList.remove(holder.getAdapterPosition());
-                                TrangChuAcivity.hoaDonChiTietList.add(holder.getAdapterPosition(), new HoaDonChiTiet(0, ma, maSach[0], soLuong, getGia(maSach[0], soLuong)));
-                                TrangChuAcivity.billDetailDao.upadate(new HoaDonChiTiet(0, ma, maSach[0], soLuong, getGia(maSach[0], soLuong)), idHoaDonChiTiet);
+
+//                                FragmentHdct.hoaDonChiTietList = TrangChuAcivity.billDetailDao.getDateHoaDonChiTiet();
+//                                FragmentHdct.recyclerHDCT.notifyDataSetChanged();
+
+                                FragmentHdct.checkFragemt = true;
+
                                 hoaDonList.get(position).textButton = "Edit";
                                 notifyItemChanged(holder.getAdapterPosition());
                                 dialog.cancel();
                                 Toast.makeText(context, "Lưu thành công", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "Bạn không được để trống,số lượng lớn hơn 0 (số lượng nhập không được vượt quá số lượng sách) và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Bạn không được để trống và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -177,7 +147,7 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
                 } else {
                     if (checkXoaHoaDon() == false) {
                         TrangChuAcivity.billDao.delete(TrangChuAcivity.hoaDonList.get(position).getMaHoaDon());
-                        TrangChuAcivity.hoaDonList.remove(position);
+                        hoaDonList.remove(position);
                         notifyItemRemoved(position);
                     } else {
                         Toast.makeText(context, "Bạn không thể xóa hóa đơn khi liên kết với hóa đơn chi tiết", Toast.LENGTH_SHORT).show();
@@ -186,7 +156,6 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return hoaDonList.size();
@@ -249,27 +218,11 @@ public class RecyclerHoaDon extends RecyclerView.Adapter<RecyclerHoaDon.ViewHole
         return maMoi;
     }
 
-    public boolean checkSoLuongSua(int soLuong, String maSach, int position) {
-        for (int i = 0; i < TrangChuAcivity.sachList.size(); i++) {
-            if (maSach.equals(TrangChuAcivity.sachList.get(i).getMa())) {
-
-                int soLuongSach = TrangChuAcivity.sachList.get(i).getSoLuong();
-                int soLuongHoaDon = Integer.parseInt(TrangChuAcivity.hoaDonChiTietList.get(position).getSoLuongMua());
-
-                if (soLuong <= soLuongSach + soLuongHoaDon) {
-                    TrangChuAcivity.bookDao.updateSoLuong(TrangChuAcivity.sachList.get(i).getMa(), soLuongSach + soLuongHoaDon - soLuong);
-                    TrangChuAcivity.sachList.get(i).setSoLuong(soLuongSach + soLuongHoaDon - soLuong);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     public boolean checkXoaHoaDon() {
         for (int i = 0; i < TrangChuAcivity.hoaDonList.size(); i++) {
-            for (int j = 0; j < TrangChuAcivity.hoaDonChiTietList.size(); j++) {
-                if (TrangChuAcivity.hoaDonList.get(i).getMaHoaDon().equals(TrangChuAcivity.hoaDonChiTietList.get(j).getMaHoaDon())) {
+            for (int j = 0; j < FragmentHdct.hoaDonChiTietList.size(); j++) {
+                if (TrangChuAcivity.hoaDonList.get(i).getMaHoaDon().equals(FragmentHdct.hoaDonChiTietList.get(j).getMaHoaDon())) {
                     return true;
                 }
             }

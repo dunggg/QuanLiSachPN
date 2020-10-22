@@ -41,21 +41,21 @@ public class BookTypeDao {
         return theLoaiList;
     }
 
-    public void updateSoLuong(String maTheLoai,int soLuong) {
+    public void updateSoLuong(String maTheLoai, int soLuong) {
         ContentValues values = new ContentValues();
         values.put("soLuong", soLuong);
         database.update("type", values, "maTheLoai = ?", new String[]{String.valueOf(maTheLoai)});
     }
 
-    public void update(TheLoai theLoai,String maTheLoai){
+    public void update(TheLoai theLoai, String maTheLoai) {
         ContentValues values = new ContentValues();
-        values.put("maTheLoai",theLoai.getMa());
-        values.put("tenTheLoai",theLoai.getTenTheLoai());
-        values.put("soLuong",theLoai.getMa());
-        database.update("type",values,"maTheLoai=?",new String[]{maTheLoai});
+        values.put("maTheLoai", theLoai.getMa());
+        values.put("tenTheLoai", theLoai.getTenTheLoai());
+        values.put("soLuong", theLoai.getMa());
+        database.update("type", values, "maTheLoai=?", new String[]{maTheLoai});
     }
 
-    public void delete(String maTheLoai){
-        database.delete("type","maTheLoai=?",new String[]{maTheLoai});
+    public void delete(String maTheLoai) {
+        database.delete("type", "maTheLoai=?", new String[]{maTheLoai});
     }
 }

@@ -58,7 +58,6 @@ public class HoaDonActivity extends AppCompatActivity {
 
         anhXa();
         setSupportActionBar(toolbar);
-        setDataSpinner();
         RecyclerHoaDon.checkRcvHd = false;
         RecyclerHDCT.checkButton = false;
         listMa = new ArrayList<>();
@@ -66,8 +65,11 @@ public class HoaDonActivity extends AppCompatActivity {
         myViewPage = new MyViewPage(getSupportFragmentManager(), MyViewPage.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(myViewPage);
         tabLayout.setupWithViewPager(viewPager);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+
 
         arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, listMa);
         lv.setAdapter(arrayAdapter);
@@ -182,86 +184,51 @@ public class HoaDonActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.itemThem:
                 if (viewPager.getCurrentItem() == 0) {
-                    if (spinnerListMaSach.size() == 0) {
-                        Toast.makeText(this, "Bạn cần thêm sách trước khi thêm hóa đơn", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // thêm hóa đơn
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("Thêm hóa đơn");
-                        builder.setCancelable(false);
-                        LayoutInflater inflater = LayoutInflater.from(this);
-                        View view = inflater.inflate(R.layout.them_hoadon, null);
-                        builder.setView(view);
+                    // thêm hóa đơn
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Thêm hóa đơn");
+                    builder.setCancelable(false);
+                    LayoutInflater inflater = LayoutInflater.from(this);
+                    View view = inflater.inflate(R.layout.them_hoadon, null);
+                    builder.setView(view);
 
-                        final TextInputEditText txtMaHoaDon, txtSoLuong;
-                        Spinner spinner = view.findViewById(R.id.spinnerThemHD);
-                        txtMaHoaDon = view.findViewById(R.id.txtMaHDThemHD);
-                        txtSoLuong = view.findViewById(R.id.txtSoLuongThemHD);
-                        Button btnThem = view.findViewById(R.id.btnThemThemHd);
-                        Button btnHuy = view.findViewById(R.id.btnHuyThemHD);
+                    final TextInputEditText txtMaHoaDon, txtSoLuong;
+                    txtMaHoaDon = view.findViewById(R.id.txtMaHDThemHD);
+                    Button btnThem = view.findViewById(R.id.btnThemThemHd);
+                    Button btnHuy = view.findViewById(R.id.btnHuyThemHD);
 
-                        ArrayAdapter arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, spinnerListMaSach);
-                        spinner.setAdapter(arrayAdapter);
-                        final String[] maSach = {null};
-                        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                maSach[0] = spinnerListMaSach.get(position);
-                            }
+                    final Dialog dialog = builder.create();
 
-                            @Override
-                            public void onNothingSelected(AdapterView<?> parent) {
+                    btnThem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String ma = txtMaHoaDon.getText().toString().trim();
+                            String ngay = getDate();
 
-                            }
-                        });
+                            if (checkMa(ma) < 0) {
 
-
-                        final Dialog dialog = builder.create();
-
-                        btnThem.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String ma = txtMaHoaDon.getText().toString().trim();
-                                String soLuong = txtSoLuong.getText().toString().trim();
-                                String ngay = getDate();
-                                boolean checkSoLuong = checkSoLuong(Integer.parseInt(soLuong), maSach[0]);
-
-                                if (checkMa(ma) < 0 && soLuong.length() > 0 && Integer.parseInt(soLuong) > 0 && ngay.length() > 0 && checkSoLuong == true) {
-                                    TrangChuAcivity.billDetailDao.insert(new HoaDonChiTiet(0, ma, maSach[0], soLuong, String.valueOf(getGia(maSach[0], soLuong))));
-
-                                    // lấy id từ csdl về để truyền vào list
-                                    TrangChuAcivity.hoaDonChiTietList = TrangChuAcivity.billDetailDao.getData();
-                                    int id = TrangChuAcivity.hoaDonChiTietList.get(TrangChuAcivity.hoaDonChiTietList.size() - 1).getId();
-
-                                    // lấy giá đã chuyển đổi truyền vào list
-                                    String gia = convertGia(String.valueOf(getGia(maSach[0], soLuong)));
-
-                                    TrangChuAcivity.hoaDonList.add(new HoaDon(ma, ngay));
-                                    TrangChuAcivity.billDao.insert(new HoaDon(ma, ngay));
-                                    FragmentHdct.hoaDonChiTietList.add(new HoaDonChiTiet(id, ma, maSach[0], soLuong, gia, ngay));
-                                    TrangChuAcivity.hoaDonList.get(TrangChuAcivity.hoaDonList.size() - 1).textButton = textButton;
-                                    FragmentHdct.hoaDonChiTietList.get(FragmentHdct.hoaDonChiTietList.size() - 1).textButton = textButton;
-                                    FragmentHoaDon.recyclerHoaDon.notifyItemInserted(TrangChuAcivity.hoaDonList.size() - 1);
-                                    FragmentHdct.recyclerHDCT.notifyItemInserted(FragmentHdct.hoaDonChiTietList.size() - 1);
-                                    Toast.makeText(HoaDonActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                                    dialog.cancel();
-                                } else {
-                                    Toast.makeText(HoaDonActivity.this, "Bạn không được để trống,số lượng lớn hơn 0 (không nhập nhiều hơn số lượng sách) và mã hóa đơn không được trùng", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-
-                        btnHuy.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
+                                TrangChuAcivity.hoaDonList.add(new HoaDon(ma, ngay));
+                                TrangChuAcivity.billDao.insert(new HoaDon(ma, ngay));
+                                TrangChuAcivity.hoaDonList.get(TrangChuAcivity.hoaDonList.size() - 1).textButton = textButton;
+                                FragmentHoaDon.recyclerHoaDon.notifyItemInserted(TrangChuAcivity.hoaDonList.size() - 1);
+                                Toast.makeText(HoaDonActivity.this, "Thêm thành công", Toast.LENGTH_SHORT).show();
                                 dialog.cancel();
+                            } else {
+                                Toast.makeText(HoaDonActivity.this, "Bạn không được để trống và không được trùng hóa đơn", Toast.LENGTH_SHORT).show();
                             }
-                        });
+                        }
+                    });
 
-                        dialog.show();
+                    btnHuy.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.cancel();
+                        }
+                    });
 
-                    }
+                    dialog.show();
                 } else {
+                    setDataSpinner();
                     if (spinnerListMaSach.size() != 0 && spinnerListHoaDon.size() != 0) {
                         // thêm hóa đơn chi tiết
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -419,16 +386,6 @@ public class HoaDonActivity extends AppCompatActivity {
         total += stringBuilder.substring(a, stringBuilder.length());
         return new StringBuilder(total).reverse().toString();
     }
-
-    // get data từ db về có cả chữ vnd nên phải dùng hàm này để bỏ chữ vnd đi
-//    public static String giaSach(String gia) {
-//        String[] gia1 = gia.split("[,]|\\D");
-//        String maMoi = "";
-//        for (int i = 0; i < gia1.length; i++) {
-//            maMoi += gia1[i];
-//        }
-//        return maMoi;
-//    }
 
     public static boolean checkSoLuong(int soLuong, String maSach) {
         for (int i = 0; i < TrangChuAcivity.sachList.size(); i++) {
